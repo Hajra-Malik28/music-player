@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Online Music Player</title>
+
+<style>
+body{
+font-family:Arial;
+background:#0f0f0f;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+width:350px;
+background:#1e1e1e;
+padding:20px;
+border-radius:15px;
+text-align:center;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:10px 0;
+border:none;
+border-radius:5px;
+}
+
+button{
+padding:8px 12px;
+margin:5px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+background:#03a9f4;
+color:white;
+}
+
+button:hover{
+background:#0288d1;
+}
+
+ul{
+list-style:none;
+padding:0;
+max-height:200px;
+overflow:auto;
+}
+
+li{
+background:#2a2a2a;
+padding:10px;
+margin:5px;
+border-radius:5px;
+text-align:left;
+}
+
+.smallBtn{
+background:green;
+font-size:12px;
+margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>🎵 Online Music Player</h2>
+
+<input type="text" id="search" placeholder="Search song (e.g. Atif Aslam)">
+
+<button onclick="searchSong()">🔎 Search</button>
+
+<ul id="results"></ul>
+
+<audio id="audio" controls style="width:100%;margin-top:10px;"></audio>
+</div>
+
+<script>
+let audio = document.getElementById("audio");
+let results = document.getElementById("results");
+
+let songs = [];
+let index = 0;
+
+// 🔎 SEARCH SONGS
+async function searchSong(){
+let q = document.getElementById("search").value;
+
+if(q === ""){
+alert("Search something first!");
+return;
+}
+
+let res = await fetch(`https://itunes.apple.com/search?term=${q}&entity=song&limit=10`);
+let data = await res.json();
+
+songs = data.results;
+
+results.innerHTML = "";
+
+songs.forEach((song,i)=>{
+
+// 🌐 WWW LINK (Google/YouTube search)
+let wwwLink = `https://www.google.com/search?q=${song.trackName}+${song.artistName}`;
+
+let li = document.createElement("li");
+
+li.innerHTML = `
+<b>${song.trackName}</b><br>
+${song.artistName}<br>
+
+<button onclick="playSong(${i})">▶ Play Preview</button>
+
+<button class="smallBtn" onclick="window.open('${wwwLink}','_blank')">
+🌐 Open WWW Link
+</button>
+`;
+
+results.appendChild(li);
+});
+}
+
+// ▶ PLAY SONG
+function playSong(i){
+index = i;
+audio.src = songs[i].previewUrl;
+audio.play();
+}
+</script>
+
+</body>
+</html>
